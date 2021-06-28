@@ -3,6 +3,8 @@
     "version": "1.0.0",
     "description": "Rpg game",
     "scripts": {
+        "build:dev": "cross-env NODE_ENV=development webpack",
+        "build": "cross-env NODE_ENV=production webpack",
         "lint": "npx eslint src/**/*.js",
         "dev": "npx webpack server"
     },
@@ -19,6 +21,7 @@
     "devDependencies": {
         "@babel/core": "^7.14.6",
         "babel-loader": "^8.2.2",
+        "cross-env": "^7.0.3",
         "css-loader": "^5.2.6",
         "eslint": "^7.29.0",
         "eslint-config-airbnb-base": "^14.2.1",
