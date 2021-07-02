@@ -12,6 +12,6 @@ module.exports = {
   },
   rules: {
     // 'linebreak-style': 0,
-    'tabWidth': 4,
+    // 'tabWidth': 4,
   },
 };
