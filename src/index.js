@@ -3,43 +3,42 @@ import personWalk from './assets/Male-3-Walk.png';
 import grassBcg from './assets/background/grass-2.jpg';
 
 const canvas = document.querySelector('#game');
-canvas.style.background = `url(${grassBcg})`;
 
 const canvasRect = canvas.getBoundingClientRect();
-
-// console.log(canvasRect);
-window.addEventListener('scroll', () => {
-  // console.log('prokrutili: ', window.scrollY);
-});
 
 const gameAreaWidth = canvasRect.width;
 const gameAreaHeight = canvasRect.height;
 
 const ctx = canvas.getContext('2d');
 
+// персонаж
 const player = document.createElement('img');
-
 player.src = personWalk;
-
 const spriteW = 48;
 const spriteH = 48;
+
+// переменные для движения персонажа
 const frames = 4;
 let cycle = 0;
+let framesCount = 0;
+let pY = ((gameAreaHeight / 2 - spriteH) / 10).toFixed(0) * 10;
+let pX = ((gameAreaWidth / 2 - spriteW / 2) / 10).toFixed(0) * 10;
+let direction = 0;
 
+// объект для управления клавиатурой
 const arrowPressed = {
   up: false,
   down: false,
   left: false,
   right: false,
 };
+
+// переменные для управления мышью
 let targetY = null;
 let targetX = null;
-// console.log(targetX);
-
-let framesCount = 0;
-let pY = ((gameAreaHeight / 2 - spriteH) / 10).toFixed(0) * 10;
-let pX = ((gameAreaWidth / 2 - spriteW / 2) / 10).toFixed(0) * 10;
-let direction = 0;
+let mouseClick = false;
+let cursorClickRadius = null;
+let deltaCursorClickRadius = null;
 
 function playerMove() {
   framesCount += 1;
@@ -53,16 +52,37 @@ function playerMove() {
     framesCount = 0;
   }
 }
-
+// отрисовка персонажа
 function playerRender() {
   ctx.drawImage(player, cycle * spriteW, direction * spriteH, spriteW, spriteH, pX, pY, 48, 48);
-  // console.log(pY);
-  // console.log(targetY);
+}
+
+// отрисовка карты
+function mapRender() {
+  canvas.style.background = `url(${grassBcg})`;
+
+  const gradient = ctx.createLinearGradient(300, 0, 500, 0);
+  gradient.addColorStop(0, 'rgb(223, 187, 0)');
+  gradient.addColorStop(0.5, 'rgb(142, 139, 7)');
+  gradient.addColorStop(1, 'rgb(206, 160, 23)');
+  ctx.strokeStyle = gradient;
+  ctx.lineWidth = 50;
+  ctx.moveTo(400, -50);
+  ctx.quadraticCurveTo(300, 50, 500, 700);
+  ctx.filter = 'sepia(30%)';
+  // ctx.arc(canvasRect.width / 5, canvasRect.height / 5, 100, 0, 2 * Math.PI);
+  ctx.stroke();
+
+  ctx.beginPath();
+}
+
+function mainRender() {
+  mapRender();
+  playerRender();
 }
 
 function keyDownHandler(e) {
   e.preventDefault();
-
   targetX = null;
   targetY = null;
   if (e.key === 'Down' || e.key === 'ArrowDown') {
@@ -94,69 +114,55 @@ function keyUpHandler(e) {
   }
 }
 
-function drawTargetMove() {
-  let radius = 5;
-  let changeRadius = 1;
+function drawTargetCursorMove() {
+  mouseClick = true;
+  ctx.filter = 'none';
+  ctx.clearRect(0, 0, gameAreaWidth, gameAreaHeight);
+  ctx.beginPath();
+  mainRender();
 
-  // ctx.closePath();
-
-  if (radius === 15 || radius === 5) {
-    changeRadius *= -1;
+  cursorClickRadius += deltaCursorClickRadius;
+  if (cursorClickRadius >= 15 || cursorClickRadius <= 5) {
+    deltaCursorClickRadius *= -1;
   }
-  ctx.strokeStyle = 'red';
-  // ctx.beginPath();
-  ctx.moveTo(targetX, targetY);
-  ctx.arc(targetX, targetY, radius, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(100, 50, 80, 0.5)';
+  ctx.lineWidth = 5;
+
+  ctx.arc(targetX, targetY, cursorClickRadius, 0, Math.PI * 2);
   ctx.stroke();
 
-  radius += changeRadius;
-  changeRadius += 1;
-
-  if (pX > targetX - 30 && pX < targetX + 30 && pY > targetY - 30 && pY < targetY - 30) {
-    ctx.clearRect(0, 0, 600, 600);
-    playerRender();
+  if (pX <= targetX + 21 && pX >= targetX - 21 && pY <= targetY + 20 && pY >= targetY - 50) {
+    ctx.clearRect(0, 0, gameAreaWidth, gameAreaHeight);
+    ctx.beginPath();
+    mainRender();
+    mouseClick = false;
     return;
   }
-  // ctx.clearRect(0, 0, gameAreaWidth, gameAreaHeight);
-  // playerRender();
-  requestAnimationFrame(drawTargetMove);
+
+  requestAnimationFrame(drawTargetCursorMove);
+}
+
+function mouseLeftClickHandler(e) {
+  cursorClickRadius = 5;
+  deltaCursorClickRadius = 0.1;
+
+  targetX = ((e.pageX - window.scrollX - canvas.getBoundingClientRect().left) / 10).toFixed(0) * 10;
+  targetY = ((e.pageY - window.scrollY - canvas.getBoundingClientRect().top) / 10).toFixed(0) * 10;
+  if (mouseClick === false) {
+    drawTargetCursorMove(e);
+  }
 }
 
 document.addEventListener('keydown', keyDownHandler);
 document.addEventListener('keyup', keyUpHandler);
-canvas.addEventListener('click', (e) => {
-  // targetX = ((e.clientX - (canvasRect.left + pageXOffset)) / 10).toFixed(0) * 10;
-  // targetY = ((e.clientY - (canvasRect.top + pageYOffset)) / 10).toFixed(0) * 10;
-  // drawTargetMove();
 
-  targetX = ((e.pageX - window.scrollX - canvas.getBoundingClientRect().left) / 10).toFixed(0) * 10;
-
-  targetY = ((e.pageY - window.scrollY - canvas.getBoundingClientRect().top) / 10).toFixed(0) * 10;
-  drawTargetMove();
-  // console.log(`e.pageY: ${e.pageY}`);
-  // console.log(`pageYOffset: ${pageYOffset}`);
-  // console.log(`canvasRect.top: ${canvas.getBoundingClientRect().top}`);
-
-  // console.log(`targetY: ${targetY}`);
-
-  // // console.log('e.clientX: ', e.clientX);
-  // console.log('e.clientY: ', e.clientY);
-  // // console.log('e.pageX: ', e.pageX);
-  // console.log('e.pageY: ', e.pageY);
-  // // console.log('targetX : ', targetX);
-  // console.log('targetY: ', targetY);
-  // console.log(
-  //     'canvasRect.top + document.body.scrollTop: ',
-  //     ((canvasRect.top + document.body.scrollTop) / 10).toFixed(0) * 10,
-  // );
-});
+// Клик мышью
+canvas.addEventListener('click', mouseLeftClickHandler);
 
 player.addEventListener('load', () => {
-  // window.scrollTop;
-  // console.log(window.scrollY);
-  // console.log(document.documentElement.offsetHeight);
-  // console.dir(document);
-  document.querySelector('#loading-status').style.display = 'none';
+  document.querySelector('#loading-status').style.display = 'none'; //! поменять
+
+  // PlayGame -----------------------------------------------------------------------
   setInterval(() => {
     if (arrowPressed.down && pY < gameAreaHeight - spriteH) {
       direction = 0;
@@ -206,6 +212,6 @@ player.addEventListener('load', () => {
 
     ctx.clearRect(0, 0, gameAreaWidth, gameAreaHeight);
 
-    playerRender();
+    mainRender();
   }, 120);
 });
