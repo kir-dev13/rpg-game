@@ -27,11 +27,17 @@ let direction = 0;
 
 // объект для управления клавиатурой
 const arrowPressed = {
-  up: false,
-  down: false,
-  left: false,
-  right: false,
+  ArrowUp: false,
+  ArrowDown: false,
+  ArrowRight: false,
+  ArrowLeft: false,
 };
+// const arrowPressed = {
+//   up: false,
+//   down: false,
+//   left: false,
+//   right: false,
+// };
 
 // переменные для управления мышью
 let targetY = null;
@@ -81,38 +87,48 @@ function mainRender() {
   playerRender();
 }
 
+// function keyDownHandler(e) {
+//   e.preventDefault();
+//   targetX = null;
+//   targetY = null;
+//   if (e.key === 'Down' || e.key === 'ArrowDown') {
+//     arrowPressed.down = true;
+//   }
+//   if (e.key === 'Up' || e.key === 'ArrowUp') {
+//     arrowPressed.up = true;
+//   }
+//   if (e.key === 'Left' || e.key === 'ArrowLeft') {
+//     arrowPressed.left = true;
+//   }
+//   if (e.key === 'Right' || e.key === 'ArrowRight') {
+//     arrowPressed.right = true;
+//   }
+// }
+
 function keyDownHandler(e) {
   e.preventDefault();
-  targetX = null;
-  targetY = null;
-  if (e.key === 'Down' || e.key === 'ArrowDown') {
-    arrowPressed.down = true;
-  }
-  if (e.key === 'Up' || e.key === 'ArrowUp') {
-    arrowPressed.up = true;
-  }
-  if (e.key === 'Left' || e.key === 'ArrowLeft') {
-    arrowPressed.left = true;
-  }
-  if (e.key === 'Right' || e.key === 'ArrowRight') {
-    arrowPressed.right = true;
-  }
+  arrowPressed[e.key] = true;
 }
 
 function keyUpHandler(e) {
-  if (e.key === 'Down' || e.key === 'ArrowDown') {
-    arrowPressed.down = false;
-  }
-  if (e.key === 'Up' || e.key === 'ArrowUp') {
-    arrowPressed.up = false;
-  }
-  if (e.key === 'Left' || e.key === 'ArrowLeft') {
-    arrowPressed.left = false;
-  }
-  if (e.key === 'Right' || e.key === 'ArrowRight') {
-    arrowPressed.right = false;
-  }
+  e.preventDefault();
+  arrowPressed[e.key] = false;
 }
+
+// function keyUpHandler(e) {
+//   if (e.key === 'Down' || e.key === 'ArrowDown') {
+//     arrowPressed.down = false;
+//   }
+//   if (e.key === 'Up' || e.key === 'ArrowUp') {
+//     arrowPressed.up = false;
+//   }
+//   if (e.key === 'Left' || e.key === 'ArrowLeft') {
+//     arrowPressed.left = false;
+//   }
+//   if (e.key === 'Right' || e.key === 'ArrowRight') {
+//     arrowPressed.right = false;
+//   }
+// }
 
 function drawTargetCursorMove() {
   mouseClick = true;
