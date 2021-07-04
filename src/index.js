@@ -10,7 +10,6 @@ const gameAreaWidth = canvasRect.width;
 const gameAreaHeight = canvasRect.height;
 
 const ctx = canvas.getContext('2d');
-const ctx2 = canvas.getContext('2d');
 
 // персонаж
 const player = document.createElement('img');
@@ -65,12 +64,11 @@ let delta = 0;
 function mapRender() {
   i += delta;
   delta += 0.02;
-  if (delta.toFixed(2) >= 1 || delta.toFixed(2) <= -2) {
+  delta = +delta.toFixed(2);
+  if (delta.toFixed(2) >= 1 || delta.toFixed(2) <= -1) {
     delta *= -1;
   }
-  // console.log(i);
-  // console.log(delta.toFixed(2));
-  // трава
+  i = +i.toFixed(2);
   canvas.style.background = `url(${grassBcg})`;
 
   // дорога
@@ -99,15 +97,10 @@ function mapRender() {
   ctx.strokeStyle = 'blue';
   ctx.lineWidth = 64;
   ctx.fillRect(0, 520, 600, 80);
-  ctx.moveTo(-50, 500 + i);
-  ctx.bezierCurveTo(150 + i * 20, 550 + i, 300 + i * 20, 500 + i, 610, 530 + i);
+  ctx.moveTo(-50, 500 + i * 2);
+  ctx.bezierCurveTo(150 + i * 30, 550 + i * 1.5, 300 + i * 30, 500 + i * 1.2, 630, 530 + i);
   ctx.stroke();
   ctx.beginPath();
-}
-
-function mainRender() {
-  mapRender();
-  playerRender();
 }
 
 function keyDownHandler(e) {
@@ -148,38 +141,38 @@ function keyUpHandler(e) {
 function drawTargetCursorMove() {
   mouseClick = true;
   // ctx.filter = 'none';
-  ctx2.clearRect(0, 0, gameAreaWidth, gameAreaHeight);
-  ctx2.beginPath();
-  mainRender();
 
   cursorClickRadius += deltaCursorClickRadius;
-  if (cursorClickRadius >= 15 || cursorClickRadius <= 5) {
+  if (cursorClickRadius >= 10 || cursorClickRadius <= 5) {
     deltaCursorClickRadius *= -1;
   }
-  ctx2.strokeStyle = 'rgba(100, 50, 80, 0.5)';
-  ctx2.lineWidth = 5;
+  ctx.strokeStyle = 'rgba(100, 50, 80, 0.5)';
+  ctx.lineWidth = 5;
 
-  ctx2.arc(targetX, targetY, cursorClickRadius, 0, Math.PI * 2);
-  ctx2.stroke();
+  ctx.arc(targetX, targetY, cursorClickRadius, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.beginPath();
 
   if (pX <= targetX - 20 && pX >= targetX - 21 && pY <= targetY + 20 && pY >= targetY - 50) {
-    ctx2.clearRect(0, 0, gameAreaWidth, gameAreaHeight);
-    ctx2.beginPath();
-    mainRender();
     mouseClick = false;
 
     playerMoving = false;
     cycle = 1;
-    return;
   }
+}
 
-  requestAnimationFrame(drawTargetCursorMove);
+function mainRender() {
+  mapRender();
+  playerRender();
+  if (mouseClick) {
+    drawTargetCursorMove();
+  }
 }
 
 function mouseLeftClickHandler(e) {
   playerMoving = true;
   cursorClickRadius = 5;
-  deltaCursorClickRadius = 0.1;
+  deltaCursorClickRadius = 1;
 
   targetX = ((e.pageX - window.scrollX - canvas.getBoundingClientRect().left) / 10).toFixed(0) * 10;
   targetY = ((e.pageY - window.scrollY - canvas.getBoundingClientRect().top) / 10).toFixed(0) * 10;
