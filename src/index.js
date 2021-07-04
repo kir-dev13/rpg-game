@@ -10,6 +10,7 @@ const gameAreaWidth = canvasRect.width;
 const gameAreaHeight = canvasRect.height;
 
 const ctx = canvas.getContext('2d');
+const ctx2 = canvas.getContext('2d');
 
 // персонаж
 const player = document.createElement('img');
@@ -58,10 +59,21 @@ function playerRender() {
   ctx.drawImage(player, cycle * spriteW, direction * spriteH, spriteW, spriteH, pX, pY, 48, 48);
 }
 
+let i = 0;
+let delta = 0;
 // отрисовка карты
 function mapRender() {
+  i += delta;
+  delta += 0.02;
+  if (delta.toFixed(2) >= 1 || delta.toFixed(2) <= -2) {
+    delta *= -1;
+  }
+  // console.log(i);
+  // console.log(delta.toFixed(2));
+  // трава
   canvas.style.background = `url(${grassBcg})`;
 
+  // дорога
   const gradient = ctx.createLinearGradient(300, 0, 500, 0);
   gradient.addColorStop(0, 'rgb(223, 187, 0)');
   gradient.addColorStop(0.5, 'rgb(142, 139, 7)');
@@ -70,10 +82,26 @@ function mapRender() {
   ctx.lineWidth = 50;
   ctx.moveTo(400, -50);
   ctx.quadraticCurveTo(300, 50, 500, 700);
-  ctx.filter = 'sepia(30%)';
-  // ctx.arc(canvasRect.width / 5, canvasRect.height / 5, 100, 0, 2 * Math.PI);
   ctx.stroke();
+  ctx.beginPath();
 
+  ctx.lineWidth = 74;
+  ctx.fillStyle = 'rgb(223, 187, 0)';
+  ctx.strokeStyle = gradient;
+  ctx.moveTo(-50, 490);
+  ctx.quadraticCurveTo(150, 460, 300, 500);
+  ctx.moveTo(250, 500);
+  ctx.quadraticCurveTo(350, 500, 650, 530);
+  ctx.stroke();
+  ctx.beginPath();
+
+  ctx.fillStyle = 'blue';
+  ctx.strokeStyle = 'blue';
+  ctx.lineWidth = 64;
+  ctx.fillRect(0, 520, 600, 80);
+  ctx.moveTo(-50, 500 + i);
+  ctx.bezierCurveTo(150 + i * 20, 550 + i, 300 + i * 20, 500 + i, 610, 530 + i);
+  ctx.stroke();
   ctx.beginPath();
 }
 
@@ -119,24 +147,24 @@ function keyUpHandler(e) {
 
 function drawTargetCursorMove() {
   mouseClick = true;
-  ctx.filter = 'none';
-  ctx.clearRect(0, 0, gameAreaWidth, gameAreaHeight);
-  ctx.beginPath();
+  // ctx.filter = 'none';
+  ctx2.clearRect(0, 0, gameAreaWidth, gameAreaHeight);
+  ctx2.beginPath();
   mainRender();
 
   cursorClickRadius += deltaCursorClickRadius;
   if (cursorClickRadius >= 15 || cursorClickRadius <= 5) {
     deltaCursorClickRadius *= -1;
   }
-  ctx.strokeStyle = 'rgba(100, 50, 80, 0.5)';
-  ctx.lineWidth = 5;
+  ctx2.strokeStyle = 'rgba(100, 50, 80, 0.5)';
+  ctx2.lineWidth = 5;
 
-  ctx.arc(targetX, targetY, cursorClickRadius, 0, Math.PI * 2);
-  ctx.stroke();
+  ctx2.arc(targetX, targetY, cursorClickRadius, 0, Math.PI * 2);
+  ctx2.stroke();
 
   if (pX <= targetX - 20 && pX >= targetX - 21 && pY <= targetY + 20 && pY >= targetY - 50) {
-    ctx.clearRect(0, 0, gameAreaWidth, gameAreaHeight);
-    ctx.beginPath();
+    ctx2.clearRect(0, 0, gameAreaWidth, gameAreaHeight);
+    ctx2.beginPath();
     mainRender();
     mouseClick = false;
 
@@ -167,7 +195,7 @@ document.addEventListener('keyup', keyUpHandler);
 canvas.addEventListener('click', mouseLeftClickHandler);
 
 player.addEventListener('load', () => {
-  document.querySelector('#loading-status').style.display = 'none'; //! поменять
+  // document.querySelector('#loading-status').style.display = 'none'; //! поменять
 
   // PlayGame -----------------------------------------------------------------------
   setInterval(() => {
