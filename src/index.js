@@ -24,20 +24,15 @@ let framesCount = 0;
 let pY = ((gameAreaHeight / 2 - spriteH) / 10).toFixed(0) * 10;
 let pX = ((gameAreaWidth / 2 - spriteW / 2) / 10).toFixed(0) * 10;
 let direction = 0;
+let playerMoving = false;
 
 // объект для управления клавиатурой
 const arrowPressed = {
-  ArrowUp: false,
-  ArrowDown: false,
-  ArrowRight: false,
-  ArrowLeft: false,
+  up: false,
+  down: false,
+  left: false,
+  right: false,
 };
-// const arrowPressed = {
-//   up: false,
-//   down: false,
-//   left: false,
-//   right: false,
-// };
 
 // переменные для управления мышью
 let targetY = null;
@@ -87,48 +82,40 @@ function mainRender() {
   playerRender();
 }
 
-// function keyDownHandler(e) {
-//   e.preventDefault();
-//   targetX = null;
-//   targetY = null;
-//   if (e.key === 'Down' || e.key === 'ArrowDown') {
-//     arrowPressed.down = true;
-//   }
-//   if (e.key === 'Up' || e.key === 'ArrowUp') {
-//     arrowPressed.up = true;
-//   }
-//   if (e.key === 'Left' || e.key === 'ArrowLeft') {
-//     arrowPressed.left = true;
-//   }
-//   if (e.key === 'Right' || e.key === 'ArrowRight') {
-//     arrowPressed.right = true;
-//   }
-// }
-
 function keyDownHandler(e) {
   e.preventDefault();
-  arrowPressed[e.key] = true;
+  targetX = null;
+  targetY = null;
+  if (e.key === 'Down' || e.key === 'ArrowDown') {
+    arrowPressed.down = true;
+  }
+  if (e.key === 'Up' || e.key === 'ArrowUp') {
+    arrowPressed.up = true;
+  }
+  if (e.key === 'Left' || e.key === 'ArrowLeft') {
+    arrowPressed.left = true;
+  }
+  if (e.key === 'Right' || e.key === 'ArrowRight') {
+    arrowPressed.right = true;
+  }
 }
 
 function keyUpHandler(e) {
-  e.preventDefault();
-  arrowPressed[e.key] = false;
+  playerMoving = false;
+  cycle = 1;
+  if (e.key === 'Down' || e.key === 'ArrowDown') {
+    arrowPressed.down = false;
+  }
+  if (e.key === 'Up' || e.key === 'ArrowUp') {
+    arrowPressed.up = false;
+  }
+  if (e.key === 'Left' || e.key === 'ArrowLeft') {
+    arrowPressed.left = false;
+  }
+  if (e.key === 'Right' || e.key === 'ArrowRight') {
+    arrowPressed.right = false;
+  }
 }
-
-// function keyUpHandler(e) {
-//   if (e.key === 'Down' || e.key === 'ArrowDown') {
-//     arrowPressed.down = false;
-//   }
-//   if (e.key === 'Up' || e.key === 'ArrowUp') {
-//     arrowPressed.up = false;
-//   }
-//   if (e.key === 'Left' || e.key === 'ArrowLeft') {
-//     arrowPressed.left = false;
-//   }
-//   if (e.key === 'Right' || e.key === 'ArrowRight') {
-//     arrowPressed.right = false;
-//   }
-// }
 
 function drawTargetCursorMove() {
   mouseClick = true;
@@ -147,11 +134,14 @@ function drawTargetCursorMove() {
   ctx.arc(targetX, targetY, cursorClickRadius, 0, Math.PI * 2);
   ctx.stroke();
 
-  if (pX <= targetX + 21 && pX >= targetX - 21 && pY <= targetY + 20 && pY >= targetY - 50) {
+  if (pX <= targetX - 20 && pX >= targetX - 21 && pY <= targetY + 20 && pY >= targetY - 50) {
     ctx.clearRect(0, 0, gameAreaWidth, gameAreaHeight);
     ctx.beginPath();
     mainRender();
     mouseClick = false;
+
+    playerMoving = false;
+    cycle = 1;
     return;
   }
 
@@ -159,6 +149,7 @@ function drawTargetCursorMove() {
 }
 
 function mouseLeftClickHandler(e) {
+  playerMoving = true;
   cursorClickRadius = 5;
   deltaCursorClickRadius = 0.1;
 
@@ -183,24 +174,24 @@ player.addEventListener('load', () => {
     if (arrowPressed.down && pY < gameAreaHeight - spriteH) {
       direction = 0;
       pY += 10;
-      playerMove();
+      playerMoving = true;
     }
 
     if (arrowPressed.up && pY > 0) {
       direction = 3;
       pY -= 10;
-      playerMove();
+      playerMoving = true;
     }
 
     if (arrowPressed.left && pX > 0) {
       direction = 1;
       pX -= 10;
-      playerMove();
+      playerMoving = true;
     }
     if (arrowPressed.right && pX < gameAreaWidth - spriteW) {
       direction = 2;
       pX += 10;
-      playerMove();
+      playerMoving = true;
     }
 
     // Управление мышью
@@ -208,24 +199,24 @@ player.addEventListener('load', () => {
     if (targetY && pY > targetY - Math.round(spriteH / 10) * 10) {
       direction = 3;
       pY -= 10;
-      playerMove();
     }
     if (targetY && pY < targetY - Math.round(spriteH / 10) * 10) {
       direction = 0;
       pY += 10;
-      playerMove();
     }
     if (targetX && pX > targetX - Math.round(spriteW / 20) * 10) {
       direction = 1;
       pX -= 10;
-      playerMove();
     }
     if (targetX && pX < targetX - Math.round(spriteW / 20) * 10) {
       direction = 2;
       pX += 10;
-      playerMove();
     }
 
+    // console.log(moving);
+    if (playerMoving) {
+      playerMove();
+    }
     ctx.clearRect(0, 0, gameAreaWidth, gameAreaHeight);
 
     mainRender();
