@@ -99,15 +99,19 @@ function mapRender() {
   ctx.beginPath();
 
   // круг
-
-  ctx.lineWidth = 10;
+  ctx.save();
+  ctx.scale(1, 0.75);
+  // ctx.beginPath();
+  // ctx.lineWidth = 10;
   ctx.fillStyle = getColor(colorCircle);
   // ctx.fillStyle = 'grey';
-  ctx.arc(200, 200, 30, 0, 2 * Math.PI);
+  ctx.arc(200, 200, 40, 0, 2 * Math.PI);
   ctx.fill();
-  ctx.beginPath();
+  ctx.closePath();
+  ctx.restore();
 
   // песок
+  ctx.beginPath();
   ctx.lineWidth = 84;
   ctx.fillStyle = 'rgb(223, 187, 0)';
   ctx.strokeStyle = gradient;
@@ -146,6 +150,7 @@ function mapRender() {
   ctx.stroke();
   ctx.beginPath();
 
+  // волны
   ctx.lineWidth = 2;
   for (let j = 0; j <= 180; j += 10) {
     // coordsWaves.x0 += j;
@@ -165,12 +170,21 @@ function mapRender() {
     ctx.stroke();
     ctx.beginPath();
   }
-  // ctx.moveTo(-50, 475 + i * 1.8);
-  // ctx.lineWidth = 3;
-  // ctx.strokeStyle = 'rgba(150, 225, 255, 0.5)';
-  // ctx.bezierCurveTo(150 + i * 30, 550 + i * 0.2 + i, 300 + i * 30, 460 + i, 630, 500 + i);
-  // ctx.stroke();
-  // ctx.beginPath();
+  for (let k = 0; k <= 601; k += 100) {
+    if (k === 0) {
+      k = 50;
+    }
+    i *= -1;
+    for (let n = 10; n <= 101; n += 10) {
+      i *= -1;
+      ctx.moveTo(k * n * 0.1 + i, 550 + n + i);
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(255, 225, 255, 0.3)';
+      ctx.lineTo(k * n * 0.1 + 50 + i, 550 + n + i);
+      ctx.stroke();
+      ctx.beginPath();
+    }
+  }
 }
 
 function keyDownHandler(e) {
@@ -347,9 +361,9 @@ player.addEventListener('load', () => {
 
     playerControlKeyboardListener();
 
-    if (pY > 170 - spriteH && pY < 230 - spriteH && pX > 170 - spriteW && pX < 230) {
+    if (pY > 120 - spriteH && pY < 180 - spriteH && pX > 160 - spriteW && pX < 240) {
       colorCircle[0] += 1;
-      colorCircle[1] += 1;
+      colorCircle[1] += 5;
     } else {
       colorCircle = [160, 157, 157, 1];
     }
