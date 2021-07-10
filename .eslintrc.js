@@ -11,7 +11,8 @@ module.exports = {
     sourceType: 'module',
   },
   rules: {
-    ignoreComments: true,
+    ignoreComments: 0,
+    'object-curly-newline': 'off',
     // 'linebreak-style': 0,
     // 'tabWidth': 4,
   },

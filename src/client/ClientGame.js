@@ -23,7 +23,7 @@ class ClientGame {
 
   initEngine() {
     this.engine.loadSprites(sprites).then(() => {
-      this.engine.on('render', (_, time) => {
+      this.engine.on('render', () => {
         this.map.init();
       });
       this.engine.start();
@@ -33,10 +33,10 @@ class ClientGame {
   static init(cfg) {
     if (!ClientGame.game) {
       ClientGame.game = new ClientGame(cfg);
-      console.log('Game INIT');
+      // console.log('Game INIT');
       // console.log(levelCfg.map.length);
       // console.log(ClientGame.map.levelCfg);
-      console.log(ClientGame.game.map);
+      // console.log(ClientGame.game.map);
     }
   }
 }
