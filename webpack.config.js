@@ -1,7 +1,8 @@
 const path = require("path");
 const HTMLWebpackPlugin = require("html-webpack-plugin");
-
+require('dotenv').config();
 const NODE_ENV = process.env.NODE_ENV;
+
 
 module.exports = {
     mode: NODE_ENV || "development",
@@ -47,6 +48,7 @@ module.exports = {
     plugins: [
         new HTMLWebpackPlugin({
             template: path.resolve(__dirname, "public/index.html"),
+            
         }),
     ],
     devServer: {
@@ -57,4 +59,5 @@ module.exports = {
         historyApiFallback: true,
     },
     devtool: NODE_ENV === 'development' ? 'source-map' : false,
+    // devtool: 'source-map'
 };

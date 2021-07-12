@@ -1,3 +1,5 @@
 webpack.config.js
 dist
 scripts
+src/index_old.js
+common/
