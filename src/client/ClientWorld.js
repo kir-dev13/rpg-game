@@ -1,42 +1,56 @@
-class ClientWorld {
+import PositionedObject from '../common/PositionedObject';
+import ClientCell from './ClientCell';
+
+class ClientWorld extends PositionedObject {
   constructor(game, engine, levelCfg) {
+    super();
+    const worldHeigt = levelCfg.map.length;
+    const worldWidth = levelCfg.map[0].length;
+    const cellSize = engine.canvas.height / levelCfg.camera.height;
     Object.assign(this, {
       game,
       engine,
       levelCfg,
-      height: levelCfg.map.length,
-      width: levelCfg.map[0].length,
+      height: worldHeigt * cellSize,
+      width: worldWidth * cellSize,
+      worldHeigt,
+      worldWidth,
+      cellWidth: cellSize,
+      cellHeight: cellSize,
+      map: [],
     });
   }
 
   init() {
-    for (let i = 0; i < this.height; i += 1) {
-      for (let j = 0; j < this.width; j += 1) {
-        this.engine.renderSpriteFrame({
-          sprite: ['terrain', this.levelCfg.map[i][j][this.levelCfg.map[i][j].length - 1]],
-          frame: 0,
-          x: j * 32,
-          y: i * 32,
-          w: 32,
-          h: 32,
+    const { levelCfg, map, worldWidth, worldHeigt } = this;
+
+    for (let row = 0; row < worldHeigt; row += 1) {
+      for (let col = 0; col < worldWidth; col += 1) {
+        if (!map[row]) {
+          map[row] = [];
+        }
+        map[row][col] = new ClientCell({
+          world: this,
+          cellCol: col,
+          cellRow: row,
+          cellCfg: levelCfg.map[row][col],
         });
       }
     }
   }
-  // init() {
-  //   this.levelCfg.map.forEach((cfgRow, yCoord) => {
-  //     cfgRow.forEach((cfgCell, xCoord) => {
-  //       this.engine.renderSpriteFrame({
-  //         sprite: ['terrain', cfgCell[0]],
-  //         frame: 0,
-  //         x: xCoord * 32,
-  //         y: yCoord * 32,
-  //         w: 32,
-  //         h: 32,
-  //       });
-  //     });
-  //   });
-  // }
+
+  render(time) {
+    const { map, worldWidth, worldHeigt } = this;
+    for (let row = 0; row < worldHeigt; row += 1) {
+      for (let col = 0; col < worldWidth; col += 1) {
+        map[row][col].render(time);
+      }
+    }
+  }
+
+  cellAt(col, row) {
+    return this.map[row] && this.map[row][col];
+  }
 }
 
 export default ClientWorld;
